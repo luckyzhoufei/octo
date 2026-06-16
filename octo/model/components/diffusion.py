@@ -63,9 +63,10 @@ class FourierFeatures(nn.Module):
             )
             f = 2 * jnp.pi * x @ w.T
         else:
+            # transformer中的位置编码公式
             half_dim = self.output_size // 2
             f = jnp.log(10000) / (half_dim - 1)
-            f = jnp.exp(jnp.arange(half_dim) * -f)
+            f = jnp.exp(jnp.arange(half_dim) * -f)  # arange(half_dim) 最大值是half_dim-1
             f = x * f
         return jnp.concatenate([jnp.cos(f), jnp.sin(f)], axis=-1)
 
