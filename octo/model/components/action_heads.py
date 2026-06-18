@@ -166,9 +166,7 @@ class ContinuousActionHead(nn.Module, ActionHead):
         # Now, embeddings is (batch_size, window_size, embedding_size)
 
         mean = self.mean_proj(embeddings)
-        mean = rearrange(
-            mean, "b w (h a) -> b w h a", h=self.action_horizon, a=self.action_dim
-        )
+        mean = rearrange(mean, "b w (h a) -> b w h a", h=self.action_horizon, a=self.action_dim)
         mean = jnp.tanh(mean / self.max_action) * self.max_action
         return mean
 

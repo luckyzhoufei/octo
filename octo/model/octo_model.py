@@ -225,6 +225,7 @@ class OctoModel:
                     jnp.ones_like(unnormalization_statistics["mean"], dtype=bool),
                 )
                 action = action[..., : len(mask)]
+                # where(condition, x, y); condition ? ; x:y
                 action = jnp.where(
                     mask,
                     (action * unnormalization_statistics["std"])
