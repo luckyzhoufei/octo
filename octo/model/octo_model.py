@@ -161,7 +161,7 @@ class OctoModel:
             batch_size = len(texts)
             tasks.update(
                 {
-                    k: np.zeros((batch_size, *v.shape[1:]), dtype=v.dtype)
+                    k: np.zeros((batch_size, *v.shape[1:]), dtype=v.dtype)  # "image_primary" "image_wrist"
                     for k, v in self.example_batch["task"].items()
                     if k not in ("pad_mask_dict", "language_instruction")
                 }

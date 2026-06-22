@@ -89,7 +89,7 @@ class OctoTransformer(nn.Module):
     @nn.compact
     def __call__(
         self,
-        observations: Data,
+        observations: Data,   # 原始图片
         tasks: Data,
         timestep_pad_mask: jax.Array,
         readouts: Optional[Sequence[str]] = None,
