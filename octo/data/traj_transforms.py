@@ -37,7 +37,7 @@ def chunk_act_obs(
     # indicates which observations at the beginning of the trajectory are padding
     timestep_pad_mask = history_indices >= 0
     # repeat the first observation at the beginning of the trajectory rather than going out of bounds
-    history_indices = tf.maximum(history_indices, 0)
+    history_indices = tf.maximum(history_indices, 0)   # -2，-1之类的帧用第0帧替换
     # gather
     traj["observation"] = tf.nest.map_structure(
         lambda x: tf.gather(x, history_indices), traj["observation"]
@@ -51,7 +51,7 @@ def chunk_act_obs(
             action_horizon
         )  # [traj_len, action_horizon]
         # repeat the last action at the end of the trajectory rather than going out of bounds
-        action_chunk_indices = tf.minimum(action_chunk_indices, traj_len - 1)
+        action_chunk_indices = tf.minimum(action_chunk_indices, traj_len - 1)   # 结束的那一刻，往后几步是没有action，用结束的那一刻的action代替
         # gather
         traj["action"] = tf.gather(
             traj["action"], action_chunk_indices
@@ -70,6 +70,7 @@ def chunk_act_obs(
     )  # [traj_len, window_size, action_horizon, action_dim]
 
     # finally, we deal with marking which actions are past the goal timestep (or final timestep if no goal)
+    # 存在目标已经实现，但视频仍在录制的数据
     if "timestep" in traj["task"]:
         goal_timestep = traj["task"]["timestep"]
     else:
