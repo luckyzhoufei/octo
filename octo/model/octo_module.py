@@ -157,6 +157,13 @@ class OctoTransformer(nn.Module):
         # First, add the task tokens
         #
 
+        # config["model"]["task_tokenizers"] = {
+        #     "language": ModuleSpec.create(
+        #         LanguageTokenizer,
+        #         encoder="t5-base",
+        #         finetune_encoder=False,
+        #     ),
+        # }
         for name, tok in self.task_tokenizers.items():
             group_name = f"task_{name}"
             # Receive inputs from tokenizer and cast to embedding size
@@ -185,6 +192,20 @@ class OctoTransformer(nn.Module):
         #
         # Next, add the observation tokens
         #
+        # config["model"]["observation_tokenizers"] = {
+        #     "primary": ModuleSpec.create(
+        #         ImageTokenizer,
+        #         obs_stack_keys=["image_primary"],
+        #         task_stack_keys=["image_primary"],
+        #         encoder=ModuleSpec.create(SmallStem16),
+        #     ),
+        #     "wrist": ModuleSpec.create(
+        #         ImageTokenizer,
+        #         obs_stack_keys=["image_wrist"],
+        #         task_stack_keys=["image_wrist"],
+        #         encoder=ModuleSpec.create(SmallStem16),
+        #     ),
+        # }
 
         for name, tok in self.observation_tokenizers.items():
             group_name = f"obs_{name}"

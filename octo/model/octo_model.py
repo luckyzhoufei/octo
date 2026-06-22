@@ -22,6 +22,56 @@ from octo.utils.spec import ModuleSpec
 from octo.utils.typing import Config, Data, Params, PRNGKey, Sequence
 
 
+# example_batch = {
+#     # ==========================================
+#     # 1. Observation (机器人当前的观测状态/传感器数据)
+#     # 包含多帧历史画面和自身状态
+#     # ==========================================
+#     "observation": {
+#         # 主视角相机图像：(Batch, Time, Height, Width, Channel)
+#         "image_primary": np.zeros((2, 2, 256, 256, 3), dtype=np.uint8),
+#         # 腕部相机图像
+#         "image_wrist": np.zeros((2, 2, 128, 128, 3), dtype=np.uint8),
+#         # 本体感受（机械臂关节角度、末端位置、夹爪开合等，假设维度是 7）
+#         "proprio": np.zeros((2, 2, 7), dtype=np.float32),
+#
+#         # 观测数据的掩码（比如时间窗口不足2帧时，用于屏蔽补零的帧）
+#         "pad_mask_dict": {
+#             "image_primary": np.ones((2, 2), dtype=bool),
+#             "image_wrist": np.ones((2, 2), dtype=bool),
+#             "proprio": np.ones((2, 2), dtype=bool),
+#         }
+#     },
+#
+#     # ==========================================
+#     # 2. Task (告诉机器人它的目标是什么)
+#     # 这就是你上一题问到的 task 字典在系统内部的标准样貌
+#     # ==========================================
+#     "task": {
+#         # 语言指令的 Token ID (Batch, Seq_len)
+#         "language_instruction": np.zeros((2, 16), dtype=np.int32),
+#
+#         # 目标图像 (注意，目标图通常只有一张静态图，所以没有 Time 维度，或者 Time=1)
+#         "image_primary": np.zeros((2, 256, 256, 3), dtype=np.uint8),
+#         "image_wrist": np.zeros((2, 128, 128, 3), dtype=np.uint8),
+#
+#         "pad_mask_dict": {
+#             "language_instruction": np.ones((2,), dtype=bool),
+#             "image_primary": np.ones((2,), dtype=bool),
+#             "image_wrist": np.ones((2,), dtype=bool),
+#         }
+#     },
+#
+#     # ==========================================
+#     # 3. Action (机器人应该执行的动作，通常用于训练计算 Loss)
+#     # ==========================================
+#     "action": np.zeros((2, 2, 7), dtype=np.float32),  # (Batch, Time, 动作维度)
+#
+#     # 动作掩码（判断哪些动作是有效的，哪些是 padding 补齐的）
+#     "action_pad_mask": np.ones((2, 2), dtype=bool)
+# }
+
+
 @struct.dataclass
 class OctoModel:
     """Recommended way of interacting with Octo models.
@@ -73,13 +123,28 @@ class OctoModel:
     example_batch: Data
     dataset_statistics: Optional[Data]
 
+    #     task = {
+    #     # 1. 真实的语言指令
+    #     "language_instruction": np.array([[101, 4567, 892, 345, 102, ...]]),
+    #
+    #     # 2. 真实的目标图像
+    #     "image_primary": np.array([[[[120, 100, 50], ...]]]]),
+    #     "image_wrist": np.array([[[[80, 80, 80], ...]]]]),
+    #
+    #     # 3. 掩码字典：全部为 True！
+    #     "pad_mask_dict": {
+    #         "language_instruction": np.array([True]),  # 听我的话！
+    #         "image_primary": np.array([True]),         # 也要看这张图！
+    #         "image_wrist": np.array([True])            # 也要看这张图！
+    #     }
+    #   }
     def create_tasks(
         self, goals: Optional[Data] = None, texts: Optional[Sequence[str]] = None
     ):
         """Creates tasks dict from goals and texts.
 
         Args:
-            goals: if not None, dict of arrays with shape (batch_size, *)
+            goals: if not None, dict of arrays with shape (batch_size, *)  图像目标
             texts: if not None, list of texts of length batch_size
 
         Omit images to run the language-conditioned model, and omit texts to run the
