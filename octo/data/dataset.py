@@ -339,6 +339,7 @@ def make_dataset_from_rlds(
         traj_len = tf.shape(traj["action"])[0]
         old_obs = traj["observation"]
         new_obs = {}
+        # 提取图像，重新命名  image_obs_keys={"primary": "workspace", "wrist": None}
         for new, old in image_obs_keys.items():
             if old is None:
                 new_obs[f"image_{new}"] = tf.repeat("", traj_len)  # padding
@@ -474,8 +475,8 @@ def make_single_dataset(
         **dataset_kwargs,
         train=train,
     )
-    dataset = apply_trajectory_transforms(dataset, **traj_transform_kwargs, train=train)
-    dataset = apply_frame_transforms(dataset, **frame_transform_kwargs, train=train)
+    dataset = apply_trajectory_transforms(dataset, **traj_transform_kwargs, train=train)  # 按轨迹
+    dataset = apply_frame_transforms(dataset, **frame_transform_kwargs, train=train)  # 按帧
 
     # this seems to reduce memory usage without affecting speed
     dataset = dataset.with_ram_budget(1)

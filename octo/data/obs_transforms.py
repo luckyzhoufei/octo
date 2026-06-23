@@ -8,7 +8,42 @@ from absl import logging
 import dlimp as dl
 import tensorflow as tf
 
+import tensorflow as tf
 
+# obs = {
+#     # ==========================================
+#     # 1. 相机图像 (Images)
+#     # 形状是标准的 (Height, Width, Channel)
+#     # ==========================================
+#     "image_primary": tf.constant([[[...]]], shape=(256, 256, 3), dtype=tf.uint8),  # 主相机的彩色图片
+#     "image_wrist": tf.constant([[[...]]], shape=(128, 128, 3), dtype=tf.uint8),  # 腕部相机的彩色图片
+#
+#     # ==========================================
+#     # 2. 深度图像 (Depth) - 可选
+#     # 形状是 (Height, Width, 1)，单通道的浮点数，表示距离
+#     # ==========================================
+#     "depth_primary": tf.constant([[[...]]], shape=(256, 256, 1), dtype=tf.float32),
+#
+#     # ==========================================
+#     # 3. 机器人本体感受 (Proprioception)
+#     # 形状是 (Dim,) 的一维向量，比如 7 代表 6个关节角 + 1个夹爪开合度
+#     # ==========================================
+#     "proprio": tf.constant([0.1, -0.5, 1.2, 0.0, -0.1, 0.8, 1.0], dtype=tf.float32),
+#
+#     # ==========================================
+#     # 4. 掩码字典 (Pad Mask Dict) -> 最核心的部分！
+#     # 注意看：它们全都是 "标量 (Scalar)" 布尔值！没有形状！
+#     # ==========================================
+#     "pad_mask_dict": {
+#         "image_primary": tf.constant(True, dtype=tf.bool),  # 这张主相机图片是真的，请处理！
+#         "image_wrist": tf.constant(False, dtype=tf.bool),  # 这张腕部图片是补零的假图，别管它！
+#         "depth_primary": tf.constant(True, dtype=tf.bool),
+#         "proprio": tf.constant(True, dtype=tf.bool),
+#     }
+# }
+
+
+# 处理的是单帧
 def augment(
     obs: dict, seed: tf.Tensor, augment_kwargs: Union[dict, Mapping[str, dict]]
 ) -> dict:

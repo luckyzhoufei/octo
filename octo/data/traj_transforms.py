@@ -7,7 +7,6 @@ from typing import Optional
 
 import tensorflow as tf
 
-
 def chunk_act_obs(
     traj: dict,
     window_size: int = 1,
@@ -147,7 +146,7 @@ def pad_actions_and_proprio(
                 traj[key],
                 [
                     *[[0, 0]] * (len(traj[key].shape) - 1),
-                    [0, max_action_dim - action_dim],
+                    [0, max_action_dim - action_dim],   # 最后一维度补0，其他维度不补
                 ],
             )
 
