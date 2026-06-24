@@ -151,10 +151,17 @@ def main(_):
         ) = make_oxe_dataset_kwargs_and_weights(
             **FLAGS.config.dataset_kwargs["oxe_kwargs"]
         )
+        # oxe_kwargs = dict(
+        #     data_mix="oxe_magic_soup",
+        #     data_dir="gs://rail-orca-central2/resize_256_256",
+        #     load_camera_views=("primary", "wrist"),
+        #     load_depth=False,
+        #     force_recompute_dataset_statistics=False,
+        # )
         del FLAGS.config.dataset_kwargs["oxe_kwargs"]
 
     FLAGS.config.dataset_kwargs.batch_size //= jax.process_count()
-    train_data = make_interleaved_dataset(**FLAGS.config.dataset_kwargs, train=True)
+    train_data = make_interleaved_dataset(**FLAGS.config.dataset_kwargs, train=True)   # dataset_kwargs 包含了 dataset_kwargs_list  sample_weights
 
     train_data_iter = map(
         shard,

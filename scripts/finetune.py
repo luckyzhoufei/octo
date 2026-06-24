@@ -169,8 +169,8 @@ def main(_):
         train=True,
     )
     train_data_iter = (
-        dataset.repeat()
-        .unbatch()
+        dataset.repeat()    # 变成无限数据流
+        .unbatch()   # 在第一维度打开，因为一个轨迹之间太相似
         .shuffle(FLAGS.config.shuffle_buffer_size)
         .batch(FLAGS.config.batch_size)
         .iterator()
@@ -272,7 +272,7 @@ def main(_):
             batch["observation"]["timestep_pad_mask"],
             train=train,
         )
-        action_loss, action_metrics = bound_module.heads["action"].loss(
+        action_loss, action_metrics = bound_module.heads["action"].loss(   # loss里面调用了action的计算
             transformer_embeddings,  # action head knows to pull out the "action" readout_key
             batch["action"],
             batch["observation"]["timestep_pad_mask"],
