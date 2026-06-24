@@ -9,8 +9,8 @@ import tensorflow as tf
 
 def chunk_act_obs(
     traj: dict,
-    window_size: int = 1,
-    action_horizon: int = 1,
+    window_size: int = 1,   #  2
+    action_horizon: int = 1,    #  4
 ) -> dict:
     """Chunks actions and observations.
 
@@ -30,12 +30,15 @@ def chunk_act_obs(
     traj_len = tf.shape(traj["action"])[0]
 
     # chunk observations into histories
-    history_indices = tf.range(traj_len)[:, None] + tf.range(
-        -window_size + 1, 1
-    )  # [traj_len, window_size]
+    # [traj_len, window_size]
+    # [[-1, 0],[0, 1],[1, 2],[2, 3],[3, 4]]
+    history_indices = tf.range(traj_len)[:, None] + \
+                      tf.range(-window_size + 1, 1)  # [-1, 0]
     # indicates which observations at the beginning of the trajectory are padding
+    # [[False, True], [True, True], [True, True], [True, True]]
     timestep_pad_mask = history_indices >= 0
     # repeat the first observation at the beginning of the trajectory rather than going out of bounds
+    # [[0, 0],[0, 1],[1, 2],[2, 3],[3, 4]]
     history_indices = tf.maximum(history_indices, 0)   # -2，-1之类的帧用第0帧替换
     # gather
     traj["observation"] = tf.nest.map_structure(
@@ -46,10 +49,12 @@ def chunk_act_obs(
     # first, chunk actions into `action_horizon` current + future actions
     if len(traj["action"].shape) == 2:
         # actions are not pre-chunked
+        # [[0, 1, 2, 3],...,[T-1, T, T+1, T+2]]
         action_chunk_indices = tf.range(traj_len)[:, None] + tf.range(
             action_horizon
         )  # [traj_len, action_horizon]
         # repeat the last action at the end of the trajectory rather than going out of bounds
+        # [[0, 1, 2, 3],...,[T-1, T-1, T-1, T-1]]
         action_chunk_indices = tf.minimum(action_chunk_indices, traj_len - 1)   # 结束的那一刻，往后几步是没有action，用结束的那一刻的action代替
         # gather
         traj["action"] = tf.gather(
@@ -81,9 +86,8 @@ def chunk_act_obs(
         tf.range(action_horizon),
         indexing="ij",
     )
-    relative_goal_timestep = goal_timestep[:, None, None] - (
-        t - (window_size + 1) + w + h
-    )  # [traj_len, window_size, action_horizon]
+    # [traj_len, window_size, action_horizon]
+    relative_goal_timestep = goal_timestep[:, None, None] - (t - (window_size + 1) + w + h)
     traj["observation"]["task_completed"] = relative_goal_timestep <= 0
 
     # broadcast "action_pad_mask" to the new chunked shape, and mark actions past the goal timestep as padding
@@ -117,9 +121,9 @@ def add_pad_mask_dict(traj: dict) -> dict:
     for key in ["observation", "task"]:
         pad_mask_dict = {}
         for subkey in traj[key]:
-            if traj[key][subkey].dtype == tf.string:
+            if traj[key][subkey].dtype == tf.string:   # 传感器掉线之类用字符空表示或者task指令每隔几步有一个
                 # handles "language_instruction", "image_*", and "depth_*"
-                pad_mask_dict[subkey] = tf.strings.length(traj[key][subkey]) != 0
+                pad_mask_dict[subkey] = tf.strings.length(traj[key][subkey]) != 0   # 也是列表
             else:
                 # all other keys should not be treated as padding
                 pad_mask_dict[subkey] = tf.ones([traj_len], dtype=tf.bool)

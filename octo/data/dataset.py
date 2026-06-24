@@ -456,6 +456,7 @@ def make_dataset_from_rlds(
     return dataset, dataset_statistics
 
 
+# 处理单一数据集，主要用于微调
 def make_single_dataset(
     dataset_kwargs: dict,
     *,
@@ -486,6 +487,7 @@ def make_single_dataset(
     return dataset
 
 
+# 处理混合数据集，主要用于基座的训练
 def make_interleaved_dataset(
     dataset_kwargs_list: Sequence[dict],
     sample_weights: Optional[Sequence[float]] = None,

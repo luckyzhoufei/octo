@@ -9,6 +9,15 @@ import tensorflow as tf
 
 from octo.data.utils.data_utils import to_padding
 
+S = """Randomly rephrases language instructions with precomputed paraphrases
+    Args:
+       traj: A dictionary containing trajectory data. Should have a "task" key.
+       paraphrases_repo: The name of the HF repo containing the paraphrases file.
+       paraphrases_filename: The name of the file containing the paraphrases.
+       rephrase_prob: The probability of augmenting the language instruction. The probability of keeping the language
+           instruction is 1 - rephrase_prob.
+    """
+
 
 def delete_and_rephrase(
     traj,
@@ -53,14 +62,7 @@ class Rephraser:
 def rephrase_instruction(
     traj: dict, paraphrases_repo: str, paraphrases_filename: str, rephrase_prob: float
 ) -> dict:
-    """Randomly rephrases language instructions with precomputed paraphrases
-    Args:
-       traj: A dictionary containing trajectory data. Should have a "task" key.
-       paraphrases_repo: The name of the HF repo containing the paraphrases file.
-       paraphrases_filename: The name of the file containing the paraphrases.
-       rephrase_prob: The probability of augmenting the language instruction. The probability of keeping the language
-           instruction is 1 - rephrase_prob.
-    """
+    S
     rephraser = Rephraser(paraphrases_repo, paraphrases_filename)
 
     if "language_instruction" not in traj["task"]:
