@@ -289,7 +289,7 @@ def main(_):
     )
     def train_step(state: TrainState, batch):
         rng, dropout_rng = jax.random.split(state.rng)
-        (loss, info), grads = jax.value_and_grad(loss_fn, has_aux=True)(
+        (loss, info), grads = jax.value_and_grad(loss_fn, has_aux=True)(   #loss_fn返回两个值，用has_aux=True告诉value_and_grad只对第一个值计算，第二个值是辅助信息
             state.model.params, batch, dropout_rng, train=True
         )
         grad_norm = optax.global_norm(grads)

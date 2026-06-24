@@ -497,6 +497,7 @@ class DiffusionActionHead(nn.Module):
             0,
             self.diffusion_steps,
         )
+        # self.n_diffusion_samples>1 训练阶段，可以更加稳定
         noise = jax.random.normal(
             noise_key, (self.n_diffusion_samples,) + actions_flat.shape
         )
