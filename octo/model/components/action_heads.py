@@ -441,6 +441,7 @@ class DiffusionActionHead(nn.Module):
             f"Expected token_group.tokens to have shape (batch_size, window_size, num_tokens, embedding_size), "
             f"but got shape {token_group.tokens.shape}"
         )
+        # 4维转3维
         if self.use_map:  # Multi-head attention pooling
             embeddings = self.map_head(token_group, train=train)[:, :, 0]
         else:  # mean pooling
@@ -458,7 +459,7 @@ class DiffusionActionHead(nn.Module):
                 (*embeddings.shape[:2], self.action_dim * self.action_horizon),
                 dtype=jnp.float32,
             )
-        pred_eps = self.diffusion_model(embeddings, noisy_actions, time, train=train)
+        pred_eps = self.diffusion_model(embeddings, noisy_actions, time, train=train)   #  obs_enc, actions, time
         return pred_eps
 
     def loss(
