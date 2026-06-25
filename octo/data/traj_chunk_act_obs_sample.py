@@ -2,6 +2,9 @@ import numpy as np
 
 # 假设总步数 (traj_len) = 100
 T = 100
+W = 2
+A = 4
+D = 7
 
 trajectory = {
     # ==========================================
@@ -17,7 +20,7 @@ trajectory = {
         # 记录了 100 帧的腕部相机录像
         "image_wrist": np.zeros((T, 128, 128, 3), dtype=np.uint8),
 
-        "history_image_wrist": np.zeros((T, 2 ,128, 128, 3), dtype=np.uint8),
+        "history_image_wrist": np.zeros((T, 2 ,128, 128, 3), dtype=np.uint8),   # 训练的时候，T会被展开，打混，然后组成batch
 
         # 记录了这 100 步里，每一时刻机械臂 6个关节的角度 + 1个夹爪的状态 (7维)
         "proprio": np.zeros((T, 7), dtype=np.float32),
@@ -65,5 +68,7 @@ trajectory = {
             "image_primary": [True, ..., True],
             "timestep": [True, ..., True],
         },
-    }
+    },
+
+    "action_pad_mask": [T, W, A, D]
 }

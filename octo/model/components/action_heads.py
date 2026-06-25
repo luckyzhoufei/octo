@@ -415,7 +415,7 @@ class DiffusionActionHead(nn.Module):
 
         # create the diffusion model (score network)
         self.diffusion_model = create_diffusion_model(
-            self.action_dim * self.action_horizon,
+            self.action_dim * self.action_horizon,    # out_dim
             time_dim=self.time_dim,
             num_blocks=self.num_blocks,
             dropout_rate=self.dropout_rate,
@@ -500,7 +500,7 @@ class DiffusionActionHead(nn.Module):
         # self.n_diffusion_samples>1 训练阶段，可以更加稳定
         noise = jax.random.normal(
             noise_key, (self.n_diffusion_samples,) + actions_flat.shape
-        )
+        )  # [n_diffusion_samples, b, w, h * a]
 
         scale = jnp.sqrt(self.alpha_hats[time])
         std = jnp.sqrt(1 - self.alpha_hats[time])
@@ -511,7 +511,7 @@ class DiffusionActionHead(nn.Module):
         )
 
         # combine the timestep pad mask with the action pad mask
-        mask = timestep_pad_mask[:, :, None, None] & action_pad_mask
+        mask = timestep_pad_mask[:, :, None, None] & action_pad_mask    # action_pad_mask:[batch, window_size, action_horizon, action_dim]
         # flatten the mask to match the flat actions
         mask = rearrange(mask, "b w h a -> b w (h a)")
         # add a dimension to the mask for n_diffusion_samples

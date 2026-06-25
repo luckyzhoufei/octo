@@ -36,7 +36,7 @@ class ScoreActor(nn.Module):
         """
         t_ff = self.time_preprocess(time)
         cond_enc = self.cond_encoder(t_ff, train=train)
-        if obs_enc.shape[:-1] != cond_enc.shape[:-1]:
+        if obs_enc.shape[:-1] != cond_enc.shape[:-1]:      # 不包含最后一维
             new_shape = cond_enc.shape[:-1] + (obs_enc.shape[-1],)
             logging.debug(
                 "Broadcasting obs_enc from %s to %s", obs_enc.shape, new_shape

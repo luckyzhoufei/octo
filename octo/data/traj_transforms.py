@@ -69,8 +69,8 @@ def chunk_act_obs(
         traj["action"] = traj["action"][:, :action_horizon]
 
     # then, add the history axis to actions
-    traj["action"] = tf.gather(
-        traj["action"], history_indices
+    traj["action"] = tf.gather(  # [traj_len, action_horizon, action_dim]
+        traj["action"], history_indices   # [[0, 0],[0, 1],[1, 2],[2, 3],[3, 4]]
     )  # [traj_len, window_size, action_horizon, action_dim]
 
     # finally, we deal with marking which actions are past the goal timestep (or final timestep if no goal)
