@@ -27,6 +27,7 @@ class ScoreActor(nn.Module):
     cond_encoder: nn.Module
     reverse_network: nn.Module
 
+    # obs_enc : [batch, horizon, d]
     def __call__(self, obs_enc, actions, time, train=False):
         """
         Args:

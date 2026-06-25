@@ -87,8 +87,8 @@ def chunk_act_obs(
         indexing="ij",
     )
     # [traj_len, window_size, action_horizon]
-    relative_goal_timestep = goal_timestep[:, None, None] - (t - (window_size + 1) + w + h)
-    traj["observation"]["task_completed"] = relative_goal_timestep <= 0
+    relative_goal_timestep = goal_timestep[:, None, None] - (t - (window_size - 1) + w + h)
+    traj["observation"]["task_completed"] = relative_goal_timestep <= 0   # [F, F, F, F...,F, T, T]
 
     # broadcast "action_pad_mask" to the new chunked shape, and mark actions past the goal timestep as padding
     traj["action_pad_mask"] = tf.logical_and(
