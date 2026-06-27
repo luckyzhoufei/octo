@@ -50,9 +50,7 @@ def chunk_act_obs(
     if len(traj["action"].shape) == 2:
         # actions are not pre-chunked
         # [[0, 1, 2, 3],...,[T-1, T, T+1, T+2]]
-        action_chunk_indices = tf.range(traj_len)[:, None] + tf.range(
-            action_horizon
-        )  # [traj_len, action_horizon]
+        action_chunk_indices = tf.range(traj_len)[:, None] + tf.range(action_horizon)  # [traj_len, action_horizon]
         # repeat the last action at the end of the trajectory rather than going out of bounds
         # [[0, 1, 2, 3],...,[T-1, T-1, T-1, T-1]]
         action_chunk_indices = tf.minimum(action_chunk_indices, traj_len - 1)   # 结束的那一刻，往后几步是没有action，用结束的那一刻的action代替
