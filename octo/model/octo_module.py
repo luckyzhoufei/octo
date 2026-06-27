@@ -210,7 +210,7 @@ class OctoTransformer(nn.Module):
         for name, tok in self.observation_tokenizers.items():
             group_name = f"obs_{name}"
             # Receive inputs from tokenizer and cast to embedding size
-            tokenizer_output: TokenGroup = tok(observations, tasks, train=train)
+            tokenizer_output: TokenGroup = tok(observations, tasks, train=train)   # image token 是 4维的
             if tokenizer_output is None:
                 logging.warning(f"Skipping observation tokenizer: {group_name}")
                 continue
@@ -261,7 +261,7 @@ class OctoTransformer(nn.Module):
         #
         # Finally, add the readout tokens
         #
-
+        # 添加 readout tokens
         for readout_name in readouts:
             group_name = f"readout_{readout_name}"
             # Readouts do not correspond to any inputs, just positional embeddings
@@ -281,7 +281,7 @@ class OctoTransformer(nn.Module):
                 group_name: AttentionRule.CAUSAL,
             }  # Attend to tasks, all previous observations, and *only it's own own readout*
 
-            all_timestep_groups.append(
+            all_timestep_groups.append(   # 这里的token是4维
                 TimestepGroup(
                     tokens=readout_tokens,
                     mask=readout_mask,
@@ -302,7 +302,7 @@ class OctoTransformer(nn.Module):
             all_timestep_groups,
             train=train,
             verbose=verbose,
-        )
+        )   #  timestep_outputs 4维   [batch horizon n_tokens d]
         outputs = {}
         outputs.update(
             {

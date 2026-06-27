@@ -166,7 +166,7 @@ class BlockTransformer(nn.Module):
         assert all([group.tokens.shape[-1] == token_dim for group in timestep_groups])
 
         # Assemble input tokens (batch, total_tokens, token_embedding_size)
-        input_tokens = self.assemble_input_tokens(prefix_groups, timestep_groups)
+        input_tokens = self.assemble_input_tokens(prefix_groups, timestep_groups)   # 4维转三维
 
         # Creates correct attention mask for transformer using group attention rules and masks
         # Shape: (batch, 1, total_tokens, total_tokens)
@@ -184,7 +184,7 @@ class BlockTransformer(nn.Module):
         # Split output into prefix and timestep groups
         all_prefix_outputs, all_timestep_outputs = self.split_output_tokens(
             output, prefix_groups, timestep_groups
-        )
+        )   # 3维转4维
         return all_prefix_outputs, all_timestep_outputs
 
     def assemble_input_tokens(
